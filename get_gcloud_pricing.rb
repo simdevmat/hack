@@ -23,6 +23,12 @@ page.css('div table').each do |div|
     div.css('tbody tr').each do |type|
       if type.css('td').size == 5
         machine_type = type.css('td')[MACHINE_TYPE].text.gsub(/[\n ]/, "")
+        type.css('td')[MACHINE_TYPE].traverse do |node| 
+          if node.text? and node.text =~ /\S/
+            machine_type = node.text.gsub(/[\n ]/, "")
+            break
+          end
+        end 
         predefined_types[machine_type] = {}
         type.css('td')[PRICE].keys.select { |prices| prices.include?('hourly')}.each do |region|
           predefined_types[machine_type][region] = { 
@@ -52,14 +58,14 @@ end
 predefined_types.each do |name, regions|
 puts name.upcase
   regions.each do |region, data|
-    puts "\t#{region.sub(/-.*/, '')}: #{data['vcpus']} #{data['memory']} #{data['standard_price']} #{data['preemptible_price']}"
+    puts "\t#{region.sub(/-.*/, '').upcase}: #{data['vcpus']} #{data['memory']} #{data['standard_price']} #{data['preemptible_price']}"
   end
 end
 
 custom_types.each do |name, regions|
   puts "Custom #{name.upcase}"
   regions.each do |region, data|
-    puts "\t#{region.sub(/-.*/, '')}: #{data['standard_price']} #{data['preemptible_price']}"
+    puts "\t#{region.sub(/-.*/, '').upcase}: #{data['standard_price']} #{data['preemptible_price']}"
   end
 end
     
